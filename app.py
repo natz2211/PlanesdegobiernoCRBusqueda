@@ -1,75 +1,45 @@
 import streamlit as st
 import pandas as pd
 
-# 1. Configuración de Look and Feel Moderno
+# 1. Configuración de página
 st.set_page_config(
     page_title="Voto Informado CR 2026", 
     layout="wide", 
-    page_icon="🇨🇷",
-    initial_sidebar_state="expanded"
+    page_icon="🇨🇷"
 )
 
-# Inyección de CSS para diseño moderno
+# Estilo moderno pero limpio (CSS corregido)
 st.markdown("""
     <style>
-    .main {
-        background-color: #f0f2f6;
-    }
-    .stCheckbox {
-        padding: 5px;
-    }
-    .party-card {
-        background-color: white;
+    .stCheckbox { padding: 5px; }
+    .propuesta-card {
+        background-color: #ffffff;
         padding: 20px;
-        border-radius: 15px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        border-left: 5px solid #0047bb;
-        margin-bottom: 20px;
+        border-radius: 12px;
+        border-left: 6px solid #0047bb;
+        margin-bottom: 15px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
     }
-    .resumen-text {
-        font-size: 1.1rem;
-        color: #1f1f1f;
-        font-weight: 500;
-        margin-bottom: 10px;
+    .party-name {
+        color: #0047bb;
+        font-weight: bold;
+        font-size: 1.5rem;
+        margin-bottom: 5px;
     }
     </style>
-    """, unsafe_allow_html=True) # <-- Cambio corregido aquí
+    """, unsafe_allow_html=True)
 
-# 2. Base de Datos Estructurada (Ejemplo con datos reales y placeholders)
-datos_completos = {
-    "Liberación Nacional": {
-        "Economía y Empleo": {
-            "resumen": "Bajar tarifas eléctricas y simplificar trámites para PyMEs.",
-            "detalles": ["Revisión de fórmulas ARESEP", "Ventanilla única nacional", "Incentivos empleo joven"]
-        },
-        "Seguridad Ciudadana": {
-            "resumen": "Escáneres en puertos y policía fronteriza reforzada.",
-            "detalles": ["Escáneres en Moín y Caldera", "2000 nuevas plazas policiales", "Inteligencia compartida"]
-        }
-    },
-    "Unidad Social Cristiana": {
-        "Economía y Empleo": {
-            "resumen": "Eliminación de aranceles a canasta básica y medicinas.",
-            "detalles": ["Cero aranceles en granos", "Reforma Ley Competencia", "IVA 0% canasta básica"]
-        },
-        "Seguridad Ciudadana": {
-            "resumen": "Mano dura contra reincidentes y videovigilancia nacional.",
-            "detalles": ["Reforma Código Penal", "Cámaras faciales urbanas", "Cárcel de máxima seguridad"]
-        }
-    },
-    "Frente Amplio": {
-        "Economía y Empleo": {
-            "resumen": "Impuestos a grandes capitales y aumento de salarios mínimos.",
-            "detalles": ["Impuesto a la riqueza", "Defensa salarios sector público", "Banca para el desarrollo"]
-        },
-        "Seguridad Ciudadana": {
-            "resumen": "Prevención social y combate al financiamiento criminal.",
-            "detalles": ["Programas sociales en barrios", "Control armas", "Lucha lavado dinero"]
-        }
-    }
-}
+# 2. Título Original y Disclaimers
+st.title("🇨🇷 Voto Informado: Comparador de Planes de Gobierno - Elecciones 2026")
 
-# Lista maestra de los 20 partidos
+st.warning("⚠️ **Aviso de Independencia:** Esta aplicación es un proyecto ciudadano independiente y **NO** está afiliada, asociada ni patrocinada por el Tribunal Supremo de Elecciones (TSE) ni ninguna entidad gubernamental.")
+
+st.markdown("""
+Esta plataforma facilita el acceso a la información electoral mediante el análisis de los planes de gobierno presentados por los partidos políticos. 
+Utilizamos tecnología de IA para extraer y categorizar las propuestas oficiales.
+""")
+
+# 3. Base de Datos Estructurada (20 Partidos)
 partidos_lista = [
     "Alianza Costa Rica Primero", "Aquí Costa Rica Manda", "Avanza", 
     "Centro Democrático y Social", "Coalición Agenda Ciudadana", "De la Clase Trabajadora", 
@@ -86,15 +56,28 @@ categorias = [
     "Reforma del Estado", "Política Social", "Agro y Pesca", "Tecnología"
 ]
 
-# --- SIDEBAR ---
-st.sidebar.image("https://www.tse.go.cr/imgs/iconos/logo-TSE.svg", width=150)
-st.sidebar.title("Votante Informado 2026")
+# Diccionario de datos (Resumen + Lista de propuestas)
+db_propuestas = {
+    "Liberación Nacional": {
+        "Economía y Empleo": {"resumen": "Bajar tarifas eléctricas y simplificar trámites para PyMEs.", "detalles": ["Revisión de fórmulas tarifarias de ARESEP.", "Ventanilla única nacional para trámites.", "Incentivos fiscales para el primer empleo."]},
+        "Seguridad Ciudadana": {"resumen": "Escáneres en todos los puertos y policía fronteriza reforzada.", "detalles": ["Control total de carga en puertos.", "2000 nuevas plazas policiales.", "Cooperación internacional en inteligencia."]},
+    },
+    "Unidad Social Cristiana": {
+        "Economía y Empleo": {"resumen": "Eliminación de aranceles a canasta básica y medicinas.", "detalles": ["Cero aranceles en granos básicos.", "IVA 0% a productos de consumo masivo.", "Apertura de mercados agrícolas."]},
+        "Seguridad Ciudadana": {"resumen": "Mano dura contra reincidencia y videovigilancia nacional.", "detalles": ["Reforma al Código Penal.", "Cámaras con reconocimiento facial.", "Nueva cárcel de máxima seguridad."]},
+    },
+    "Frente Amplio": {
+        "Economía y Empleo": {"resumen": "Impuesto a la riqueza y fortalecimiento de salarios.", "detalles": ["Gravar grandes fortunas.", "Defensa del salario mínimo.", "Fortalecer la Banca para el Desarrollo."]},
+        "Seguridad Ciudadana": {"resumen": "Prevención social y combate al lavado de dinero.", "detalles": ["Inversión en cultura y deporte en barrios.", "Control estricto de armas.", "Lucha contra el financiamiento criminal."]},
+    }
+}
 
-# Opción Seleccionar Todo
+# 4. Filtros en la Barra Lateral
+st.sidebar.header("Opciones de Comparación")
 seleccionar_todos = st.sidebar.checkbox("Seleccionar todos los partidos")
 
-st.sidebar.write("---")
-st.sidebar.markdown("**Selecciona los partidos a comparar:** \n*(Aparecerán en el orden seleccionado)*")
+st.sidebar.markdown("---")
+st.sidebar.write("**Selecciona los partidos:**\n*(Los verás en el orden que los elijas)*")
 
 if seleccionar_todos:
     seleccionados = st.sidebar.multiselect("Partidos:", partidos_lista, default=partidos_lista)
@@ -103,38 +86,37 @@ else:
 
 tema_seleccionado = st.sidebar.selectbox("Selecciona un eje temático:", categorias)
 
-# --- CUERPO PRINCIPAL ---
-st.header(f"🔎 Comparativa: {tema_seleccionado}")
+# 5. Visualización de Resultados
+st.header(f"🔎 Propuestas sobre: {tema_seleccionado}")
 
 if seleccionados:
     for p in seleccionados:
-        # Lógica para obtener datos o generar placeholders si no existen
-        info_partido = datos_completos.get(p, {}).get(tema_seleccionado, {
-            "resumen": f"El plan de {p} está siendo analizado para esta categoría.",
-            "detalles": ["Información disponible próximamente a través del análisis de los PDFs del TSE."]
+        # Lógica de datos o placeholder
+        info = db_propuestas.get(p, {}).get(tema_seleccionado, {
+            "resumen": f"El plan de {p} para '{tema_seleccionado}' está bajo análisis.",
+            "detalles": ["Estamos extrayendo los puntos específicos del PDF oficial."]
         })
         
-        # Renderizado de Tarjeta por Partido
+        # UI: Tarjeta con Resumen y Expander
         st.markdown(f"""
-            <div class="party-card">
-                <h3 style="margin-top:0; color:#0047bb;">{p}</h3>
-                <p class="resumen-text">{info_partido['resumen']}</p>
+            <div class="propuesta-card">
+                <div class="party-name">{p}</div>
+                <div style="font-size: 1.1rem; color: #333;"><b>Resumen:</b> {info['resumen']}</div>
             </div>
         """, unsafe_allow_html=True)
         
-        # Expander para propuestas detalladas
         with st.expander(f"Ver todas las propuestas de {p}"):
-            for detalle in info_partido['detalles']:
-                st.write(f"✅ {detalle}")
-        st.write("") # Espaciado
+            for item in info['detalles']:
+                st.write(f"✅ {item}")
+        st.write("") # Espacio
 else:
-    st.info("👈 Selecciona partidos en la barra lateral para comenzar la comparación.")
+    st.info("👈 Selecciona partidos en la barra lateral para ver las comparativas.")
 
-# Pie de página
+# 6. Disclaimer de cierre
 st.divider()
 st.markdown("""
-<p style='text-align: center; color: gray;'>
-    <b>Fuente de datos:</b> <a href='https://www.tse.go.cr/2026/planesgobierno.html' target='_blank'>TSE Planes de Gobierno 2026</a><br>
-    Esta aplicación utiliza IA para resumir y categorizar la información oficial.
+<p style='text-align: center; font-size: 0.9rem; color: #666;'>
+    Esta es una plataforma informativa independiente. Se recomienda a los usuarios consultar los planes de gobierno originales 
+    disponibles en el <a href='https://www.tse.go.cr/2026/planesgobierno.html' target='_blank'>sitio oficial del TSE</a>.
 </p>
 """, unsafe_allow_html=True)
