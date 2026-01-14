@@ -9,81 +9,67 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Estilo personalizado para un look más moderno (CSS)
+# Inyección de CSS para diseño moderno
 st.markdown("""
     <style>
     .main {
-        background-color: #f8f9fa;
+        background-color: #f0f2f6;
     }
-    .stButton>button {
-        border-radius: 20px;
-        border: 1px solid #0047bb;
-        color: #0047bb;
+    .stCheckbox {
+        padding: 5px;
     }
-    .stButton>button:hover {
-        background-color: #0047bb;
-        color: white;
+    .party-card {
+        background-color: white;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        border-left: 5px solid #0047bb;
+        margin-bottom: 20px;
     }
-    .reportview-container .main .block-container{
-        padding-top: 2rem;
-    }
-    .card {
-        padding: 1.5rem;
-        border-radius: 10px;
-        background: white;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        margin-bottom: 1rem;
+    .resumen-text {
+        font-size: 1.1rem;
+        color: #1f1f1f;
+        font-weight: 500;
+        margin-bottom: 10px;
     }
     </style>
-    """, unsafe_allow_stdio=True)
+    """, unsafe_allow_html=True) # <-- Cambio corregido aquí
 
-# 2. Datos Expandidos (Estructura de Resumen y Detalle)
-# Aquí incluimos una lista de propuestas para cada categoría
+# 2. Base de Datos Estructurada (Ejemplo con datos reales y placeholders)
 datos_completos = {
     "Liberación Nacional": {
         "Economía y Empleo": {
             "resumen": "Bajar tarifas eléctricas y simplificar trámites para PyMEs.",
-            "detalles": [
-                "Revisión de la fórmula de cálculo de tarifas de ARESEP.",
-                "Implementación de ventanilla única nacional para emprendedores.",
-                "Incentivos fiscales para empresas que contraten jóvenes en su primer empleo.",
-                "Reducción de cargas sociales para microempresas durante los primeros 2 años."
-            ]
+            "detalles": ["Revisión de fórmulas ARESEP", "Ventanilla única nacional", "Incentivos empleo joven"]
         },
         "Seguridad Ciudadana": {
             "resumen": "Escáneres en puertos y policía fronteriza reforzada.",
-            "detalles": [
-                "Instalación de escáneres de última generación en Moín y Caldera.",
-                "Aumento de 2000 plazas en la Fuerza Pública.",
-                "Creación de un centro de inteligencia compartida con agencias internacionales.",
-                "Modernización del equipo táctico de la Policía de Fronteras."
-            ]
+            "detalles": ["Escáneres en Moín y Caldera", "2000 nuevas plazas policiales", "Inteligencia compartida"]
         }
     },
     "Unidad Social Cristiana": {
         "Economía y Empleo": {
             "resumen": "Eliminación de aranceles a canasta básica y medicinas.",
-            "detalles": [
-                "Decreto de urgencia para eliminar aranceles de importación de granos básicos.",
-                "Reforma a la Ley de Promoción de la Competencia.",
-                "Eliminación del IVA a los 20 productos más consumidos de la canasta básica.",
-                "Fomento a las Alianzas Público-Privadas para generar empleo en zonas rurales."
-            ]
+            "detalles": ["Cero aranceles en granos", "Reforma Ley Competencia", "IVA 0% canasta básica"]
         },
         "Seguridad Ciudadana": {
             "resumen": "Mano dura contra reincidentes y videovigilancia nacional.",
-            "detalles": [
-                "Reforma al artículo 31 del Código Penal sobre reincidencia.",
-                "Sistema nacional unificado de cámaras con reconocimiento facial en cascos urbanos.",
-                "Construcción de una nueva cárcel de máxima seguridad.",
-                "Fortalecimiento de la vigilancia electrónica con brazaletes de GPS activo."
-            ]
+            "detalles": ["Reforma Código Penal", "Cámaras faciales urbanas", "Cárcel de máxima seguridad"]
+        }
+    },
+    "Frente Amplio": {
+        "Economía y Empleo": {
+            "resumen": "Impuestos a grandes capitales y aumento de salarios mínimos.",
+            "detalles": ["Impuesto a la riqueza", "Defensa salarios sector público", "Banca para el desarrollo"]
+        },
+        "Seguridad Ciudadana": {
+            "resumen": "Prevención social y combate al financiamiento criminal.",
+            "detalles": ["Programas sociales en barrios", "Control armas", "Lucha lavado dinero"]
         }
     }
-    # Se pueden agregar los demás 18 partidos siguiendo esta misma estructura
 }
 
-# Lista de todos los partidos para el filtro
+# Lista maestra de los 20 partidos
 partidos_lista = [
     "Alianza Costa Rica Primero", "Aquí Costa Rica Manda", "Avanza", 
     "Centro Democrático y Social", "Coalición Agenda Ciudadana", "De la Clase Trabajadora", 
@@ -94,51 +80,61 @@ partidos_lista = [
     "Unidos Podemos", "Unión Costarricense Democrática"
 ]
 
-categorias = ["Economía y Empleo", "Seguridad Ciudadana", "Salud (CCSS)", "Educación", "Ambiente"]
+categorias = [
+    "Economía y Empleo", "Seguridad Ciudadana", "Salud (CCSS)", 
+    "Educación", "Infraestructura", "Ambiente y Energía", 
+    "Reforma del Estado", "Política Social", "Agro y Pesca", "Tecnología"
+]
 
 # --- SIDEBAR ---
 st.sidebar.image("https://www.tse.go.cr/imgs/iconos/logo-TSE.svg", width=150)
-st.sidebar.title("Configuración")
+st.sidebar.title("Votante Informado 2026")
 
 # Opción Seleccionar Todo
 seleccionar_todos = st.sidebar.checkbox("Seleccionar todos los partidos")
 
-st.sidebar.markdown("**Selecciona los partidos a comparar:** \n*(Los resultados aparecerán en el orden en que los selecciones)*")
+st.sidebar.write("---")
+st.sidebar.markdown("**Selecciona los partidos a comparar:** \n*(Aparecerán en el orden seleccionado)*")
 
 if seleccionar_todos:
     seleccionados = st.sidebar.multiselect("Partidos:", partidos_lista, default=partidos_lista)
 else:
-    # Selección manual por Checkbox simulado con multiselect (Streamlit no tiene lista de checkboxes nativa masiva eficiente)
     seleccionados = st.sidebar.multiselect("Partidos:", partidos_lista)
 
 tema_seleccionado = st.sidebar.selectbox("Selecciona un eje temático:", categorias)
 
 # --- CUERPO PRINCIPAL ---
-st.header(f"📊 Comparativa de Propuestas: {tema_seleccionado}")
-st.info("💡 Haz clic en la flecha de cada fila para ver el detalle completo de las propuestas.")
+st.header(f"🔎 Comparativa: {tema_seleccionado}")
 
 if seleccionados:
     for p in seleccionados:
-        # Obtener datos del partido o placeholders si no existen aún
+        # Lógica para obtener datos o generar placeholders si no existen
         info_partido = datos_completos.get(p, {}).get(tema_seleccionado, {
-            "resumen": f"Análisis de {tema_seleccionado} para {p} en curso...",
-            "detalles": ["Documentación en proceso de extracción del PDF oficial."]
+            "resumen": f"El plan de {p} está siendo analizado para esta categoría.",
+            "detalles": ["Información disponible próximamente a través del análisis de los PDFs del TSE."]
         })
         
-        # Diseño tipo Card Moderna con Expander
-        with st.container():
-            col1, col2 = st.columns([1, 4])
-            with col1:
-                st.markdown(f"### {p}")
-            with col2:
-                st.write(f"**Resumen:** {info_partido['resumen']}")
-                with st.expander("Ver todas las propuestas"):
-                    for item in info_partido['detalles']:
-                        st.markdown(f"• {item}")
-            st.divider()
+        # Renderizado de Tarjeta por Partido
+        st.markdown(f"""
+            <div class="party-card">
+                <h3 style="margin-top:0; color:#0047bb;">{p}</h3>
+                <p class="resumen-text">{info_partido['resumen']}</p>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        # Expander para propuestas detalladas
+        with st.expander(f"Ver todas las propuestas de {p}"):
+            for detalle in info_partido['detalles']:
+                st.write(f"✅ {detalle}")
+        st.write("") # Espaciado
 else:
-    st.warning("👈 Por favor, selecciona los partidos que deseas comparar en el menú de la izquierda.")
+    st.info("👈 Selecciona partidos en la barra lateral para comenzar la comparación.")
 
 # Pie de página
-st.markdown("---")
-st.caption("Fuente: Tribunal Supremo de Elecciones (TSE), Elecciones Nacionales 2026. Los datos son procesados por IA para facilitar la lectura ciudadana.")
+st.divider()
+st.markdown("""
+<p style='text-align: center; color: gray;'>
+    <b>Fuente de datos:</b> <a href='https://www.tse.go.cr/2026/planesgobierno.html' target='_blank'>TSE Planes de Gobierno 2026</a><br>
+    Esta aplicación utiliza IA para resumir y categorizar la información oficial.
+</p>
+""", unsafe_allow_html=True)
